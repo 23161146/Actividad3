@@ -1,0 +1,191 @@
+/* ============================================================================
+   componente.css — estilos del componente Toast (notificaciones flotantes)
+   Paleta: panel claro + tinta pizarra + un acento por tipo de mensaje.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
+
+:root {
+  --tinta: #1e2433;
+  --muted: #6b7280;
+  --panel: #ffffff;
+  --linea: #e2e4ec;
+
+  --info: #3a6ff7;
+  --info-bg: #eaf0ff;
+  --exito: #1f9d6c;
+  --exito-bg: #e7f7f0;
+  --error: #d64545;
+  --error-bg: #fceaea;
+  --advertencia: #c98a12;
+  --advertencia-bg: #fbf1de;
+
+  --fuente-titulo: 'Manrope', sans-serif;
+  --fuente-texto: 'Inter', sans-serif;
+  --fuente-mono: 'JetBrains Mono', monospace;
+}
+
+/* --------------------------- contenedor de toasts --------------------------- */
+
+.toast-contenedor {
+  position: fixed;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.toast-contenedor[data-posicion="arriba-derecha"] {
+  top: 20px;
+  right: 20px;
+  align-items: flex-end;
+}
+
+.toast-contenedor[data-posicion="arriba-izquierda"] {
+  top: 20px;
+  left: 20px;
+  align-items: flex-start;
+}
+
+.toast-contenedor[data-posicion="abajo-derecha"] {
+  bottom: 20px;
+  right: 20px;
+  align-items: flex-end;
+  flex-direction: column-reverse;
+}
+
+.toast-contenedor[data-posicion="abajo-izquierda"] {
+  bottom: 20px;
+  left: 20px;
+  align-items: flex-start;
+  flex-direction: column-reverse;
+}
+
+/* ---------------------------------- toast ---------------------------------- */
+
+.toast {
+  pointer-events: auto;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: var(--panel);
+  color: var(--tinta);
+  border-radius: 10px;
+  padding: 13px 14px 15px;
+  box-shadow: 0 8px 24px rgba(30, 36, 51, 0.14), 0 1px 3px rgba(30, 36, 51, 0.08);
+  border-left: 4px solid var(--info);
+  overflow: hidden;
+  font-family: var(--fuente-texto);
+
+  opacity: 0;
+  transform: translateX(24px) scale(0.98);
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease;
+}
+
+.toast-contenedor[data-posicion$="izquierda"] .toast {
+  transform: translateX(-24px) scale(0.98);
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.toast--saliendo {
+  opacity: 0;
+  transform: translateX(24px) scale(0.96);
+}
+
+.toast-contenedor[data-posicion$="izquierda"] .toast--saliendo {
+  transform: translateX(-24px) scale(0.96);
+}
+
+.toast--exito { border-left-color: var(--exito); }
+.toast--error { border-left-color: var(--error); }
+.toast--advertencia { border-left-color: var(--advertencia); }
+.toast--info { border-left-color: var(--info); }
+
+.toast__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-family: var(--fuente-mono);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.toast--info .toast__icono { background: var(--info-bg); color: var(--info); }
+.toast--exito .toast__icono { background: var(--exito-bg); color: var(--exito); }
+.toast--error .toast__icono { background: var(--error-bg); color: var(--error); }
+.toast--advertencia .toast__icono { background: var(--advertencia-bg); color: var(--advertencia); }
+
+.toast__mensaje {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.toast__cerrar {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.toast__cerrar:hover {
+  background: #f1f2f6;
+  color: var(--tinta);
+}
+
+.toast__progreso {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: currentColor;
+  opacity: 0.35;
+  transform-origin: left;
+  animation-name: vaciar-progreso;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.toast--info .toast__progreso { color: var(--info); }
+.toast--exito .toast__progreso { color: var(--exito); }
+.toast--error .toast__progreso { color: var(--error); }
+.toast--advertencia .toast__progreso { color: var(--advertencia); }
+
+@keyframes vaciar-progreso {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast, .toast__progreso {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-contenedor {
+    left: 12px !important;
+    right: 12px !important;
+    max-width: none;
+    align-items: stretch !important;
+  }
+}
